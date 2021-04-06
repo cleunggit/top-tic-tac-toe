@@ -1,11 +1,11 @@
 $(function() {
   Gameboard.init()
+  playerFactory
 });
 
 // Gameboard module
 const Gameboard = (() => {
 
-  // store gameboard as an array
   let gameBoard = [];
   
   const init = function () {
@@ -14,29 +14,74 @@ const Gameboard = (() => {
   }
 
   const getElements = () => {
-    $gridElement = $('#grid');
+    $cellElement = $('.cell');
+    $gameBoard = $('.gameboard');
   };
 
   const render = () => {
     for (let i = 0; i < 9; i++) {
-      const gridCell = `<div id="grid-${i}">${i}</div>`;
-      // const gridCell = '<div>';
+      const cell = $(`<div class="cell" data-cell></div>`)
+      $gameBoard.append(cell)
+    }
+    $('.cell').one('click', handleClick)
+    // $('.gameboard').addClass('x')
+  }
 
-      $gridElement.append(gridCell);
-      gameBoard.push(gridCell)
+  
+  const handleClick = (e) => {
+    const $cell = $(e.target);
+    const currentClass = Game.player1Turn ? playerFactory.player1 : playerFactory.player2;
+    Game.placeMark($cell, currentClass);
+    swapTurns()
+    console.log('player1turn', Game.player1Turn);
+  }
+  
+  const swapTurns = () => {
+    Game.player1Turn = !Game.player1Turn;
+    $gameBoard.removeClass('x')
+    $gameBoard.removeClass('circle')
+    
+    if (Game.player1Turn) {
+      $gameBoard.addClass('x')
+    } else {
+      $gameBoard.addClass('circle')
     }
   }
 
   return {
     init,
-    gameBoard
+    gameBoard,
   }
 })();
 
 // Player factory
   // store players in objects
+const playerFactory = (() => {
+  const player1 = 'x';
+  const player2 = 'circle';
 
-// Place markers on board
+  return {
+    player1: player1,
+    player2: player2
+  }
+})();
+
+const Game = (() => {
+  let player1Turn = true
+  console.log('Read Player 1');
+  // Place markers on board
+  const placeMark = (cell, currentClass) => {
+    cell.addClass(currentClass)
+  };
+  
+
+
+  return {
+    placeMark,
+    player1Turn: player1Turn
+  }
+})();
+
 
 // Check for winning combinations
 // 3 in a row or tie
